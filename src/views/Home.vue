@@ -1,3 +1,5 @@
+<!-- @format -->
+
 <template>
   <div class="home">
     <div class="chess">
@@ -25,127 +27,132 @@
 </template>
 
 <script>
-export default {
-  name: "Home",
-  data() {
-    return {
-      gameOver: false,
-    };
-  },
-  components: {},
-  computed: {
-    gameResult() {
-      if (this.game) {
-        if (this.game.state.getGameResult() == 1) {
-          if (this.player == 1) {
-            return "You win!";
-          } else {
-            return "CarloCat win!";
+  import Game from "../game/Game";
+  import EventHub from "../game/EventHub";
+  import MonteCarloTreeNode from "../game/MonteCarloTreeNode";
+  import MonteCarloSearchTree from "../game/MonteCarloSearchTree";
+
+  export default {
+    name: "Home",
+    data() {
+      return {
+        gameOver: false,
+      };
+    },
+    components: {},
+    computed: {
+      gameResult() {
+        if (this.game) {
+          if (this.game.state.getGameResult() === 1) {
+            if (this.player == 1) {
+              return "You win!";
+            } else {
+              return "CarloCat win!";
+            }
+          } else if (this.game.state.getGameResult() === 2) {
+            return "draw!";
           }
-        } else if (this.game.state.getGameResult() == 2) {
-          return "draw!";
         }
-      }
+      },
     },
-  },
-  methods: {
-    nextMove() {
-      let root = new MonteCarloTreeNode(this.game.state);
-      let mcts = new MonteCarloSearchTree(root);
-      let bestNode = mcts.bestAction(100);
-      if (bestNode) {
-        this.game.state = bestNode.state;
-        if (bestNode.isTerminalNode()) {
-          this.gameOver = true;
+    methods: {
+      nextMove() {
+        const root = new MonteCarloTreeNode(this.game.state);
+        const mcts = new MonteCarloSearchTree(root);
+        const bestNode = mcts.bestAction(100);
+        if (bestNode) {
+          this.game.state = bestNode.state;
+          if (bestNode.isTerminalNode()) {
+            this.gameOver = true;
+          }
+        } else {
+          console.log("Can't get best child!");
         }
-      } else {
-        console.log("Can't get best child!");
-      }
+      },
     },
-  },
-  mounted() {
-    let game = new Game(this.$refs.canvas);
-    EventHub.on("gameOver", () => {
-      console.log(" gameOver>> ");
-      this.gameOver = true;
-    });
-    EventHub.on("nextMove", (state) => {
+    mounted() {
+      const game = new Game(this.$refs.canvas);
+      EventHub.on("gameOver", () => {
+        console.log(" gameOver>> ");
+        this.gameOver = true;
+      });
+      EventHub.on("nextMove", () => {
+        this.nextMove();
+      });
+      EventHub.on("drawState", () => {
+        // console.log("drawState>>", JSON.parse(JSON.stringify(state)));
+      });
+      this.game = game;
       this.nextMove();
-    });
-    EventHub.on("drawState", (state) => {
-      // console.log("drawState>>", JSON.parse(JSON.stringify(state)));
-    });
-    this.game = game;
-    this.nextMove();
-  },
-};
+    },
+  };
 </script>
 
 <style lang="less">
-#app {
-  display: flex;
-}
-
-.chess {
-  width: 620px;
-  height: 620px;
-}
-
-.state-board {
-  width: 150px;
-  padding: 60px 0 90px 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.carlo-cat {
-  width: 100px;
-  height: 100px;
-  text-align: center;
-}
-
-.player {
-  width: 100px;
-  height: 100px;
-  text-align: center;
-}
-
-.turn {
-  animation: fade 1s linear infinite;
-  border: 4px solid red;
-  border-radius: 8px;
-  position: absolute;
-  top: 60px;
-  width: 130px;
-  height: 140px;
-}
-
-@keyframes fade {
-  from {
-    opacity: 1;
+  #app {
+    display: flex;
   }
-  50% {
-    opacity: 0.3;
-  }
-  to {
-    opacity: 1;
-  }
-}
 
-.result-dialog {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 1000px;
-  height: 860px;
-  background-color: rgba(0, 0, 0, 0.7);
-  font-size: 60px;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
+  .chess {
+    width: 620px;
+    height: 620px;
+  }
+
+  .state-board {
+    width: 150px;
+    padding: 60px 0 90px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .carlo-cat {
+    width: 100px;
+    height: 100px;
+    text-align: center;
+  }
+
+  .player {
+    width: 100px;
+    height: 100px;
+    text-align: center;
+  }
+
+  .turn {
+    animation: fade 1s linear infinite;
+    border: 4px solid red;
+    border-radius: 8px;
+    position: absolute;
+    top: 60px;
+    width: 130px;
+    height: 140px;
+  }
+
+  @keyframes fade {
+    from {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.3;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .result-dialog {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1000px;
+    height: 860px;
+    background-color: rgba(0, 0, 0, 0.7);
+    font-size: 60px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
 </style>

@@ -66,7 +66,7 @@ export default class MonteCarloTreeNode {
 
   bestChild(cparam) {
     console.log("bestChild>>", this.children);
-    const choicesWeights = this.children.map((child) => {
+    const choicesWeights = this.children.map(child => {
       return (
         child.q / child.numberOfVisit +
         cparam *
