@@ -1,8 +1,17 @@
 /** @format */
 
+import GameState from "./GameState";
+
 const KEYS = ["lose", "win", "draw"];
 export default class MonteCarloTreeNode {
-  constructor(state, parent) {
+  numberOfVisit: number;
+  results: Record<string, number>;
+  state: GameState;
+  untriedActions: number[][];
+  parent: MonteCarloTreeNode;
+  children: MonteCarloTreeNode[];
+
+  constructor(state: GameState, parent: MonteCarloTreeNode) {
     this.numberOfVisit = 0;
     this.results = {};
     for (const v of KEYS) {
@@ -50,12 +59,12 @@ export default class MonteCarloTreeNode {
     return currentSimulateState.getGameResult();
   }
 
-  simulatePolicy(possibleMoves) {
+  simulatePolicy(possibleMoves: number[][]) {
     //随机策略
     return possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
   }
 
-  backpropagate(result) {
+  backpropagate(result: number) {
     console.log("backpropagate>>>", result);
     this.numberOfVisit += 1;
     this.results[KEYS[result]] += 1;
@@ -64,7 +73,7 @@ export default class MonteCarloTreeNode {
     }
   }
 
-  bestChild(cparam) {
+  bestChild(cparam: number) {
     console.log("bestChild>>", this.children);
     const choicesWeights = this.children.map(child => {
       return (

@@ -23,6 +23,7 @@ export default class GameState {
     if (this.getGameResult() == 1) {
       EventHub.emit("gameOver");
     } else if (this.getGameResult() == 2) {
+      // console.log("2");
     } else {
       EventHub.emit("nextMove");
     }

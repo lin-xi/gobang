@@ -1,7 +1,9 @@
-/** @format */
+import MonteCarloTreeNode from "./MonteCarloTreeNode";
 
 export default class MonteCarloSearchTree {
-  constructor(root) {
+  root: MonteCarloTreeNode;
+
+  constructor(root: MonteCarloTreeNode) {
     this.root = root;
   }
 
